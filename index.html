@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <pre>
+        1.	Design a star schema using SQL queries for a multidimensional data model.
+        Sol:
+        
+        CREATE TABLE Product (
+            product_id INT PRIMARY KEY,
+            product_name VARCHAR(100),
+            category VARCHAR(50),
+            price DECIMAL(10, 2)
+        );
+        
+        CREATE TABLE Customer (
+            customer_id INT PRIMARY KEY,
+            customer_name VARCHAR(100),
+            gender CHAR(1),
+            age INT,
+            city VARCHAR(50)
+        );
+        
+        CREATE TABLE Date (
+            date_id INT PRIMARY KEY,
+            date DATE,
+            year INT,
+            month INT,
+            day INT,
+            quarter INT,
+            day_of_week VARCHAR(10)
+        );
+        
+        CREATE TABLE Store (
+            store_id INT PRIMARY KEY,
+            store_name VARCHAR(100),
+            location VARCHAR(100),
+            region VARCHAR(50)
+        );
+        
+        CREATE TABLE Sales (
+            sales_id INT PRIMARY KEY,
+            product_id INT,
+            customer_id INT,
+            date_id INT,
+            store_id INT,
+            quantity INT,
+            total_sales DECIMAL(10, 2),
+            FOREIGN KEY (product_id) REFERENCES Product(product_id),
+            FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+            FOREIGN KEY (date_id) REFERENCES Date(date_id),
+            FOREIGN KEY (store_id) REFERENCES Store(store_id)
+        )
+        2.	Design a snowflake schema using SQL queries for a multidimensional data model.
+        Sol:
+        -- Dimension: Product
+        CREATE TABLE Product (
+            product_id INT PRIMARY KEY,
+            product_name VARCHAR(100),
+            category_id INT,
+            FOREIGN KEY (category_id) REFERENCES Category(category_id)
+        );
+        
+        -- Sub-dimension: Category
+        CREATE TABLE Category (
+            category_id INT PRIMARY KEY,
+            category_name VARCHAR(50)
+        );
+        
+        -- Dimension: Customer
+        CREATE TABLE Customer (
+            customer_id INT PRIMARY KEY,
+            customer_name VARCHAR(100),
+            gender CHAR(1),
+            age INT,
+            location_id INT,
+            FOREIGN KEY (location_id) REFERENCES Location(location_id)
+        );
+        
+        -- Sub-dimension: Location
+        CREATE TABLE Location (
+            location_id INT PRIMARY KEY,
+            city VARCHAR(50),
+            state VARCHAR(50)
+        );
+        
+        -- Dimension: Date
+        CREATE TABLE Date (
+            date_id INT PRIMARY KEY,
+            date DATE,
+            year_id INT,
+            month_id INT,
+            FOREIGN KEY (year_id) REFERENCES Year(year_id),
+            FOREIGN KEY (month_id) REFERENCES Month(month_id)
+        );
+        
+        -- Sub-dimension: Year
+        CREATE TABLE Year (
+            year_id INT PRIMARY KEY,
+            year INT
+        );
+        
+        -- Sub-dimension: Month
+        CREATE TABLE Month (
+            month_id INT PRIMARY KEY,
+            month VARCHAR(20)
+        );
+        
+        -- Dimension: Store
+        CREATE TABLE Store (
+            store_id INT PRIMARY KEY,
+            store_name VARCHAR(100),
+            region_id INT,
+            FOREIGN KEY (region_id) REFERENCES Region(region_id)
+        );
+        
+        -- Sub-dimension: Region
+        CREATE TABLE Region (
+            region_id INT PRIMARY KEY,
+            region_name VARCHAR(50)
+        );
+        
+        -- Fact Table: Sales
+        CREATE TABLE Sales (
+            sales_id INT PRIMARY KEY,
+            product_id INT,
+            customer_id INT,
+            date_id INT,
+            store_id INT,
+            quantity INT,
+            total_sales DECIMAL(10, 2),
+            FOREIGN KEY (product_id) REFERENCES Product(product_id),
+            FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+            FOREIGN KEY (date_id) REFERENCES Date(date_id),
+            FOREIGN KEY (store_id) REFERENCES Store(store_id)
+        );
+        
+        
+        3.	Design a fact constellation schema using SQL queries for a multidimensional data model.
+        
+        
+        
+        
+        -- Dimension: Product
+        CREATE TABLE Product (
+            product_id INT PRIMARY KEY,
+            product_name VARCHAR(100),
+            category VARCHAR(50),
+            price DECIMAL(10, 2)
+        );
+        
+        -- Dimension: Customer
+        CREATE TABLE Customer (
+            customer_id INT PRIMARY KEY,
+            customer_name VARCHAR(100),
+            gender CHAR(1),
+            age INT,
+            city VARCHAR(50)
+        );
+        
+        -- Dimension: Store
+        CREATE TABLE Store (
+            store_id INT PRIMARY KEY,
+            store_name VARCHAR(100),
+            location VARCHAR(100),
+            region VARCHAR(50)
+        );
+        
+        -- Dimension: Date
+        CREATE TABLE Date (
+            date_id INT PRIMARY KEY,
+            date DATE,
+            year INT,
+            month INT,
+            day INT,
+            quarter INT,
+            day_of_week VARCHAR(10)
+        );
+        
+        -- Fact Table: Sales
+        CREATE TABLE Sales (
+            sales_id INT PRIMARY KEY,
+            product_id INT,
+            customer_id INT,
+            date_id INT,
+            store_id INT,
+            quantity INT,
+            total_sales DECIMAL(10, 2),
+            FOREIGN KEY (product_id) REFERENCES Product(product_id),
+            FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+            FOREIGN KEY (date_id) REFERENCES Date(date_id),
+            FOREIGN KEY (store_id) REFERENCES Store(store_id)
+        );
+        
+        -- Fact Table: Inventory
+        CREATE TABLE Inventory (
+            inventory_id INT PRIMARY KEY,
+            product_id INT,
+            store_id INT,
+            quantity_in_stock INT,
+            reorder_level INT,
+            FOREIGN KEY (product_id) REFERENCES Product(product_id),
+            FOREIGN KEY (store_id) REFERENCES Store(store_id)
+        );
+        
+        
+        
+        
+        4.	Implement Rollup operation on a multidimensional data model using SQL queries.
+        
+           SELECT
+            year,
+            quarter,
+            region,
+            product,
+            SUM(sales_amount) AS total_sales
+        FROM
+            sales
+        GROUP BY
+            ROLLUP(year, quarter, region, product);
+        
+        
+        5.	Implement Cube operation on a multidimensional data model using SQL queries.
+        
+        SELECT
+            year,
+            quarter,
+            region,
+            product,
+            SUM(sales_amount) AS total_sales
+        FROM
+            sales
+        GROUP BY
+            CUBE(year, quarter, region, product)
+        
+        
+        
+        
+        
+        
+        
+        6.	Write the steps to convert CSV file into ARFF format and Generate association rules using Apriori algorithm in WEKA Explorer.
+        Sol:
+        
+        7.	Implement GROUPING SETS operations on a multidimensional data model using SQL queries.
+        
+        SELECT
+            year,
+            quarter,
+            region,
+            product,
+            SUM(sales_amount) AS total_sales
+        FROM
+            sales
+        GROUP BY
+            GROUPING SETS (
+                (year, region),          -- Group by year and region
+                (year, product),         -- Group by year and product
+                (year),                  -- Group by year
+                (region),                -- Group by region
+                (quarter),               -- Group by quarter
+                ()                       -- Grand total
+            )
+        
+        
+        
+        8.	Create a CSV file with 5 attributes gender, income, qualification, buys_computer(yes or no) and generate rules using Decision Table in Weka Explorer.
+        9.	Implement concatened grouping operations on a multidimensional data model using SQL queries.
+        SELECT
+            year,
+            quarter,
+            region,
+            product,
+            SUM(sales_amount) AS total_sales
+        FROM
+            sales
+        GROUP BY
+            GROUPING SETS (
+                (year, quarter, region, product),  -- Most detailed level
+                (year, quarter, region),           -- By year, quarter, and region
+                (year, quarter),                   -- By year and quarter
+                (year, region),                    -- By year and region
+                (year),                            -- By year
+                ()                                 -- Grand total
+            )
+        
+        
+        10.	Generate ten cross fold and fifty cross fold options of testing data generation using Naïve Bayes classification in Weka Explorer.
+        
+        11.	Perform analysis task for the employee data in BI-server by applying various filters.
+        12.	Implement GROUPING SETS operations on a multidimensional data model using SQL queries.
+        SELECT
+            year,
+            quarter,
+            region,
+            product,
+            SUM(sales_amount) AS total_sales
+        FROM
+            sales
+        GROUP BY
+            GROUPING SETS (
+                (year, quarter, region, product),  -- Detailed aggregation by year, quarter, region, product
+                (year, region),                    -- Aggregation by year and region
+                (year, quarter),                   -- Aggregation by year and quarter
+                (region, product),                 -- Aggregation by region and product
+                (year),                            -- Aggregation by year
+                (region),                          -- Aggregation by region
+                ()                                 -- Grand total
+            )
+        13.	Demonstrate different options of handling missing values
+        
+        
+        
+        
+        
+        14.	Demonstrate elimination of data noise using various kinds of binning functions
+         
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        15.	Perform data pre-processing/analysis tasks unsing WEKA Tool
+        16.	Generate and compare different classification functions of WEKA Tool on German credit card dataset
+        
+        17.	Write a program to implement Apriori algorithm for association rule mining
+        
+        # Install necessary packages (if not already installed)
+        !pip install pandas mlxtend
+        
+        import pandas as pd
+        from mlxtend.frequent_patterns import apriori, association_rules
+        
+        # Sample transaction data as a list of transactions (each transaction is a set of items)
+        transactions = [
+            {'milk', 'bread'},
+            {'milk', 'diaper', 'beer', 'eggs'},
+            {'milk', 'bread', 'diaper', 'beer'},
+            {'bread', 'milk', 'diaper'},
+            {'milk', 'bread', 'eggs'},
+            {'bread', 'diaper', 'beer'}
+        ]
+        
+        # Convert the transactions to a one-hot encoded DataFrame
+        def create_one_hot(transactions):
+            unique_items = sorted(set(item for txn in transactions for item in txn))
+            one_hot_data = pd.DataFrame([{item: (item in txn) for item in unique_items} for txn in transactions])
+            return one_hot_data
+        
+        # Generate the one-hot encoded DataFrame
+        one_hot_data = create_one_hot(transactions)
+        
+        # Applying the Apriori algorithm
+        min_support = 0.5  # Minimum support for frequent itemsets
+        frequent_itemsets = apriori(one_hot_data, min_support=min_support, use_colnames=True)
+        
+        # Generating association rules
+        min_confidence = 0.7  # Minimum confidence for the association rules
+        rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=min_confidence)
+        
+        print("Frequent itemsets:")
+        print(frequent_itemsets)
+        
+        print("\nAssociation Rules:")
+        print(rules)
+        
+        18.	Write a program to implement ID3 classification algorithm
+        # Install necessary packages (if not already installed)
+        !pip install pandas sklearn
+        
+        import pandas as pd
+        from sklearn import datasets
+        from sklearn.model_selection import train_test_split
+        from sklearn.tree import DecisionTreeClassifier
+        from sklearn import tree
+        import matplotlib.pyplot as plt
+        
+        # Create a simple dataset
+        data = datasets.load_iris()  # Using the Iris dataset for illustration
+        X = pd.DataFrame(data.data, columns=data.feature_names)  # Features
+        y = pd.Series(data.target)  # Target labels
+        
+        # Split the dataset into training and testing sets
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+        
+        # Create a DecisionTreeClassifier with the ID3-like behavior
+        classifier = DecisionTreeClassifier(criterion='entropy', max_depth=3)  # Entropy criterion mimics ID3
+        classifier.fit(X_train, y_train)  # Fit the classifier on the training data
+        
+        # Visualize the decision tree
+        plt.figure(figsize=(12, 8))
+        tree.plot_tree(classifier, feature_names=data.feature_names, class_names=data.target_names, filled=True)
+        plt.show()
+        
+        # Make predictions on the test data and evaluate
+        y_pred = classifier.predict(X_test)
+        accuracy = (y_pred == y_test).mean()  # Calculate accuracy
+        
+        print("Accuracy on test set:", accuracy)
+        
+        
+        19.	Write a program to implement K-Means clustering algorithm using WEKA Tool
+        20.	Write a python program to implement the Apriori algorithm
+        # Install necessary packages (if not already installed)
+        !pip install pandas mlxtend
+        
+        import pandas as pd
+        from mlxtend.frequent_patterns import apriori, association_rules
+        
+        # Sample transaction data: a list of sets
+        transactions = [
+            {'milk', 'bread'},
+            {'milk', 'diaper', 'beer', 'eggs'},
+            {'milk', 'bread', 'diaper', 'beer'},
+            {'bread', 'milk', 'diaper'},
+            {'milk', 'bread', 'eggs'},
+            {'bread', 'diaper', 'beer'}
+        ]
+        
+        # Convert the transactions into a one-hot encoded DataFrame
+        items = sorted(set(item for txn in transactions for item in txn))
+        one_hot_data = pd.DataFrame([{item: item in txn for item in items} for txn in transactions])
+        
+        # Apply Apriori algorithm to find frequent itemsets
+        min_support = 0.5  # Minimum support threshold for frequent itemsets
+        frequent_itemsets = apriori(one_hot_data, min_support=min_support, use_colnames=True)
+        
+        # Derive association rules from frequent itemsets
+        min_confidence = 0.7  # Minimum confidence threshold for association rules
+        rules = association_rules(frequent_itemsets, metric='confidence', min_threshold=min_confidence)
+        
+        # Output frequent itemsets
+        print("Frequent Itemsets:")
+        print(frequent_itemsets)
+        
+        # Output association rules
+        print("\nAssociation Rules:")
+        print(rules)
+        
+        21.	Write a python program to implement FP-Growth
+        
+        import pandas as pd
+        from mlxtend.frequent_patterns import fpgrowth, association_rules
+        
+        # Example dataset
+        data = {
+            'Transaction': [1, 2, 3, 4, 5],
+            'Milk': [1, 1, 0, 1, 1],
+            'Bread': [1, 0, 1, 1, 1],
+            'Eggs': [0, 1, 1, 1, 0],
+            'Cheese': [1, 1, 0, 0, 1],
+        }
+        
+        df = pd.DataFrame(data)
+        df = df.set_index('Transaction')
+        
+        # Apply FP-Growth algorithm
+        frequent_itemsets = fpgrowth(df, min_support=0.5, use_colnames=True)
+        print("Frequent itemsets:")
+        print(frequent_itemsets)
+        
+        # Generate association rules
+        rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.7)
+        print("\nAssociation rules:")
+        print(rules)
+        
+        
+        22.	Write a python program to implement Closed itemset
+        
+        # Install necessary packages (if not already installed)
+        !pip install pandas mlxtend
+        
+        import pandas as pd
+        from mlxtend.frequent_patterns import apriori, association_rules, fpgrowth, fpmax
+        
+        # Sample transaction data
+        transactions = [
+            {'milk', 'bread'},
+            {'milk', 'diaper', 'beer', 'eggs'},
+            {'milk', 'bread', 'diaper', 'beer'},
+            {'bread', 'milk', 'diaper'},
+            {'milk', 'bread', 'eggs'},
+            {'bread', 'diaper', 'beer'}
+        ]
+        
+        # Convert the transactions into a one-hot encoded DataFrame
+        items = sorted(set(item for txn in transactions for item in txn))
+        one_hot_data = pd.DataFrame([{item: item in txn for item in items} for txn in transactions])
+        
+        # Use the fpmax function to find closed itemsets with minimum support
+        min_support = 0.5  # Minimum support threshold for frequent itemsets
+        closed_itemsets = fpmax(one_hot_data, min_support=min_support, use_colnames=True)
+        
+        print("Closed Itemsets:")
+        print(closed_itemsets)
+        
+        23.	Write a python program to implement Decision Tree classification on iris dataset
+        
+        # Install necessary packages (if not already installed)
+        !pip install pandas sklearn matplotlib
+        
+        import pandas as pd
+        from sklearn import datasets
+        from sklearn.model_selection import train_test_split
+        from sklearn.tree import DecisionTreeClassifier
+        from sklearn import tree
+        import matplotlib.pyplot as plt
+        
+        # Load the Iris dataset
+        iris = datasets.load_iris()  # Iris dataset contains features and target labels
+        X = pd.DataFrame(iris.data, columns=iris.feature_names)  # Features
+        y = pd.Series(iris.target)  # Target labels (0 = Setosa, 1 = Versicolor, 2 = Virginica)
+        
+        # Split the dataset into training and testing sets (70% training, 30% testing)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+        
+        # Create a Decision Tree classifier
+        classifier = DecisionTreeClassifier(criterion='gini', max_depth=3)  # Gini impurity, limited tree depth
+        classifier.fit(X_train, y_train)  # Fit the classifier on the training set
+        
+        # Visualize the decision tree
+        plt.figure(figsize=(12, 8))
+        tree.plot_tree(
+            classifier,
+            feature_names=iris.feature_names,
+            class_names=iris.target_names,
+            filled=True
+        )
+        plt.show()  # Display the decision tree visualization
+        
+        # Make predictions on the test set and calculate accuracy
+        y_pred = classifier.predict(X_test)
+        accuracy = (y_pred == y_test).mean()  # Calculate the accuracy of the classifier
+        
+        print("Accuracy on test set:", accuracy)
+        
+        24.	Write a python program to implement Neural Network classification on iris dataset
+        25.	Write a python program to implement K Means algorithm with matplotlib
+        26.	Write a python program to implement K Medoids algorithm with matplotlib
+        27.	Write a python program to implement Eclat Itemset usning matplotlib
+        28.	Develop a program to implement FP-tree 
+        
+        
+        29.	Develop a program to implement Back propogation
+        30.	Develop a program to implement Naïve bayes classification
+        
+         
+        
+        
+    </pre>
+</body>
+</html>
